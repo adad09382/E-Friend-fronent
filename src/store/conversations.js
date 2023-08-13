@@ -73,6 +73,22 @@ export const useConversationsStore = defineStore("conversations", () => {
     }
   };
 
+  let conversationIdHistory = ref([]);
+  // 將目前用戶停留的Conversation id 中的history 呈現在頁面中
+  const findConversationIdHistory = (conversationId) => {
+    console.log("開始從conversations中找尋指定id的history");
+    // 尋找符合 "_id" 的 item
+    const foundConversation = conversations.value.find(
+      (conversation) => conversation._id === conversationId,
+    );
+    // 如果找到了對應的對話，則返回它的 "history"，否則返回一個空陣列
+    conversationIdHistory.value = foundConversation
+      ? foundConversation.history
+      : [];
+    wrapper.value = conversationIdHistory.value.slice(); // 使用 slice() 進行淺拷貝，達到操作wrapper時不會變動到conversationIdHistory
+    wrapper.value.shift();
+  };
+
   // ================== 將message & audio 傳往後端的用變數與Function ==================
   // Coversation GPT 來的
   // 用戶輸入框的內容
@@ -83,9 +99,10 @@ export const useConversationsStore = defineStore("conversations", () => {
     { isAi: true,
       value: parseData}
   */
-  const wrapper = reactive([]);
+  const wrapper = ref([]);
   const loading = ref(false); // ai 是否正在loading回答
   const fd = new FormData(); // 創建一個FormData 作為patch用物件
+
   // 向後端發送消息
   const fetchAnswer = async () => {
     try {
@@ -99,29 +116,34 @@ export const useConversationsStore = defineStore("conversations", () => {
       // 新增conversation history用的message 用FormData儲存並傳送到後端
       fd.append("role", "user"); // user 設定
       fd.append("content", question.value); // user內容設定
-      console.log("fd物件");
-      console.log(fd);
-      await apiAuth.patch("/products/" + Conversation_Id, fd); // 向後端傳去修改 conversation history
-
-      // await apiAuth.patch("/conversation/" + route.params.id, fd);
-      wrapper.push({
-        // 將用戶傳來的text & audio link 傳進 Chat vue 組件
-        isAi: false,
-        value: question.value,
+      console.log("向後端傳送修改請求");
+      const { data } = await apiAuth.patch(
+        "/conversation/" + Conversation_Id.value,
+        fd,
+      ); // 向後端傳去修改 conversation history
+      clearFormData(); // 每次向後端傳patch後清除FormData
+      const userLastChat = data.result.history[data.result.history.length - 1]; // 取得history 中最近一個object
+      const messageRole = userLastChat.role;
+      const audioLink = userLastChat?.audioLink;
+      // 將用戶傳來的text & audio link 傳進 Chat vue 組件
+      wrapper.value.push({
+        role: messageRole,
+        content: question.value,
+        audioLink: audioLink,
       });
+      question.value = "";
 
-      wrapper.push({
+      // 讓聊天窗出現Loading
+      wrapper.value.push({
         isAi: true,
         value: "Loading....",
       });
-      //由於ai 回覆內容只存文字，故刪除audio
-      fd.delete("audio");
-
       // 測試用，3秒後回覆
       const res = await waitThreeSeconds();
-      console.log(res);
-      wrapper.pop();
-      wrapper.push({
+      // 向openAi 發請求，等回復
+      wrapper.value.pop(); // 收到回覆後將 loading 窗刪掉
+      // push Ai的回答
+      wrapper.value.push({
         isAi: true,
         value: res,
       });
@@ -147,10 +169,10 @@ export const useConversationsStore = defineStore("conversations", () => {
 
       // console.log(parseData);
     } catch (error) {
+      console.log("向後端傳送修改請求，失敗");
       console.log(error);
     } finally {
       loading.value = false;
-      question.value = "";
     }
   };
   // 等待3秒回應的 promise
@@ -161,6 +183,15 @@ export const useConversationsStore = defineStore("conversations", () => {
       }, 3000);
     });
   };
+  // 清除 FormData
+  const clearFormData = () => {
+    console.log("刪除fd的role & content");
+    // 環圈並删除所有keys
+    for (const key of fd.keys()) {
+      fd.delete(key);
+    }
+  };
+
   // ================== 同時調用錄音與語音識別用變數與Function ==================
   const audioRunning = ref(false); // 是否正在錄音的狀態
   /*
@@ -284,6 +315,8 @@ export const useConversationsStore = defineStore("conversations", () => {
     conversations,
     createConversation,
     getUserIdAllConversation,
+    findConversationIdHistory, // 取出指定conversation Id 取出history
+    conversationIdHistory, // 被取出的指定conversation Id history Array
     question,
     wrapper,
     loading,
@@ -295,5 +328,7 @@ export const useConversationsStore = defineStore("conversations", () => {
     toggleRecording,
     createAudioFileFromRecordedBlob,
     startRecordAndRecognition, // 開始錄音與識別
+    fetchAnswer, // 文字送出和後端互動
+    fd,
   };
 });

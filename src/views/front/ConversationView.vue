@@ -27,7 +27,7 @@
     </v-col>
 
     <!-- 對話內容框 -->
-    <v-col cols="auto" class="flex-grow-1 flex-shrink-0">
+    <v-col cols="10" class="flex-grow-1 flex-shrink-0">
       <v-responsive class="overflow-y-hidden fill-height" height="500">
         <v-card flat class="d-flex flex-column fill-height">
           <!-- 使用 v-for 創建迴圈，每个 chat object和索引作為参数 -->
@@ -36,8 +36,12 @@
             <template
               v-for="(chat, i) in wrapper"
               :key="i"
-              :class="{ ai: chat.isAi }"
-              class="flex-shrink-1 overflow-y-auto wrapper"
+              :class="{
+                ai: chat.role === 'assistant',
+                'flex-shrink-1': true,
+                'overflow-y-auto': true,
+                wrapper: true,
+              }"
             >
               <!-- 將chat object 傳遞給子組件Chat使用  -->
               <Chat :chat="chat" /> </template
@@ -57,16 +61,16 @@
               "
               @click:append="startRecordAndRecognition"
               hide-details
-            />
+            ></v-text-field>
           </v-card-text>
         </v-card>
       </v-responsive>
     </v-col>
-    <v-col cols="12">
+    <!-- <v-col cols="12">
       <div>Audio Field</div>
       <v-divider></v-divider>
       <audio v-if="audioUrl" controls :src="audioUrl"></audio>
-    </v-col>
+    </v-col> -->
   </v-row>
 </template>
 
@@ -94,6 +98,8 @@ const {
   wrapper,
   loading,
   audioUrl,
+  conversationIdHistory,
+  fd,
 } = storeToRefs(conversationsStore);
 // 引入ConversationsStore  中的指定函式
 const getIdConversation = conversationsStore.getIdConversation;
@@ -101,25 +107,30 @@ const getUserIdAllConversation = conversationsStore.getUserIdAllConversation; //
 const startRecordAndRecognition = conversationsStore.startRecordAndRecognition; //開始錄音與語音識別
 const fetchAnswer = conversationsStore.fetchAnswer;
 const waitThreeSeconds = conversationsStore.waitThreeSeconds;
-
-// =================================
+const findConversationIdHistory = conversationsStore.findConversationIdHistory;
+// ==============首次進入頁面執行的操作===================
 
 const firstConversation_Id = ref(route.params.id); // 第一次進入頁面的 route.params.id
-Conversation_Id.value = firstConversation_Id.value;
+Conversation_Id.value = firstConversation_Id.value; // 更新 pinia 儲存的Conversation_Id
+findConversationIdHistory(Conversation_Id.value); // 取得進入時所在conversation 的history
 
-// 監控路由改變，路由改變時，改變Pinia 儲存的當年聊天室id
+// 監控路由改變，路由改變時，改變pinia 儲存的當年聊天室id
 watch(
   () => route.params.id,
   (newId) => {
-    console.log("監控到route 路徑改變");
+    console.log("監控到route路徑改變");
     Conversation_Id.value = newId;
+    findConversationIdHistory(newId); //  route 路徑改變改變時，取得改變後的history
   },
 );
 // 立即執行函式，去後端撈數據
+// 撈到指定用戶的所有conversation
+// 還要將指定conversation 中的history 呈現在頁面
 (async () => {
   try {
     console.log("開始執行IIFE");
-    await getUserIdAllConversation();
+    await getUserIdAllConversation(); // 獲得指定用戶的所有對話
+    findConversationIdHistory(route.params.id); // 獲得目前對話中的所有history
   } catch (error) {
     console.log("前端IIFE失敗");
     console.log(error);
