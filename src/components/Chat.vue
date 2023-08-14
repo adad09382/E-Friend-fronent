@@ -40,7 +40,7 @@
             </div>
             <!-- 顯示目前時間和音訊總長度 -->
             <div class="time">
-              <div class="current">0:00</div>
+              <div class="current">{{ currentTime }}</div>
               <div class="divider">/</div>
               <div class="length">{{ duration }}</div>
             </div>
@@ -136,6 +136,12 @@ const speechSynthesisState = reactive({
   pause: "2",
   resume: "3",
 });
+// 語音目前與總共經過時間
+
+let timerId = null; // 存放更新currentTime的timer
+let currentTime = ref("0:00"); // 目前播放時間
+let duration = ref(null); // 語音總計時長
+
 // 目前語音合成狀態
 const playingState = ref(speechSynthesisState.end);
 // 監聽 Speak 按鈕的點擊事件
@@ -161,6 +167,7 @@ const playAiResponse = () => {
     let pausedTime = null; // 記錄暫停時間
     let totalPausedDuration = 0; // 記錄暫停的總時間
     let endTime = null; // 記錄結束時間
+
     // 創建語音合成檔案 Object
     const toSpeak = new SpeechSynthesisUtterance();
     // 被語音合成內容設定
@@ -172,35 +179,38 @@ const playAiResponse = () => {
     toSpeak.volume = 0.8; // 設置音量，0（靜音）到 1（最大音量）
 
     // start合成將合成狀態設為 start
+    // 各事件中觸發處理順序：1.計算currentTime 2.變更playingState 3.計算duration
     toSpeak.onstart = () => {
       console.log("觸發 start 事件");
-      startTime = Date.now(); // 設定當前時間為開始時間
+      timerId = setInterval(updateCurrentTime, 1000); // 開始計時，更新currentTime
       playingState.value = speechSynthesisState.start;
+      startTime = Date.now(); // 設定當前時間為開始時間
     };
     // resume合成將合成狀態設為 start
     toSpeak.onresume = () => {
       console.log("觸發resume 事件");
+      timerId = setInterval(updateCurrentTime, 1000); // 重新開始計時，更新currentTime
+      playingState.value = speechSynthesisState.start;
       if (pausedTime) {
         totalPausedDuration += Date.now() - pausedTime; // 更新暫停總時間
         pausedTime = null; // 重置暫停時間
       }
-      playingState.value = speechSynthesisState.start;
     };
     // end合成將合成狀態設為 end
     toSpeak.onend = () => {
       console.log("觸發 end 事件");
-      endTime = Date.now(); // 設定當前時間為結束時間
-      const duration = ref(
-        formaTime(endTime - startTime - totalPausedDuration),
-      ); // 計算實際播放時間
+      clearInterval(timerId); // 停止計時器
+      currentTime.value = "0:00"; // 重置currentTime
       playingState.value = speechSynthesisState.end;
+      endTime = Date.now(); // 設定當前時間為結束時間
+      duration.value = formaTime(endTime - startTime - totalPausedDuration); // 計算實際播放時間
     };
     // pause合成將合成狀態設為 pause
     toSpeak.onpause = () => {
       console.log("觸發 pause 事件");
-      pausedTime = Date.now(); // 記錄當前時間為暫停時間
-
+      clearInterval(timerId); // 停止計時器
       playingState.value = speechSynthesisState.pause;
+      pausedTime = Date.now(); // 記錄當前時間為暫停時間
     };
     // 合成出現錯誤時將合成狀態設為 end，並取消合成
     toSpeak.onerror = (error) => {
@@ -254,6 +264,20 @@ function formaTime(milliseconds) {
 
   return `${minutes}:${seconds.toString().padStart(2, "0")}`;
 }
+
+// currentTime值的function
+const updateCurrentTime = () => {
+  let currentSeconds = parseInt(currentTime.value.split(":")[1], 10);
+  let currentMinutes = parseInt(currentTime.value.split(":")[0], 10);
+  currentSeconds++;
+  if (currentSeconds >= 60) {
+    currentSeconds = 0;
+    currentMinutes++;
+  }
+  currentTime.value = `${currentMinutes
+    .toString()
+    .padStart(2, "0")}:${currentSeconds.toString().padStart(2, "0")}`;
+};
 </script>
 
 <style scoped>

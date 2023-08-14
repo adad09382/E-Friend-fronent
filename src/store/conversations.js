@@ -114,6 +114,7 @@ export const useConversationsStore = defineStore("conversations", () => {
       loading.value = true; // 是否正在loading 為 true
       // 向後端發送patch請求，儲存新的聊天紀錄
       // 新增conversation history用的message 用FormData儲存並傳送到後端
+      clearFormData(fd); // 每次向後端傳patch前，先清除FormData的殘留
       fd.append("role", "user"); // user 設定
       fd.append("content", question.value); // user內容設定
       console.log("向後端傳送修改請求");
@@ -121,7 +122,6 @@ export const useConversationsStore = defineStore("conversations", () => {
         "/conversation/" + Conversation_Id.value,
         fd,
       ); // 向後端傳去修改 conversation history
-      clearFormData(); // 每次向後端傳patch後清除FormData
       const userLastChat = data.result.history[data.result.history.length - 1]; // 取得history 中最近一個object
       const messageRole = userLastChat.role;
       const audioLink = userLastChat?.audioLink;
@@ -135,39 +135,25 @@ export const useConversationsStore = defineStore("conversations", () => {
 
       // 讓聊天窗出現Loading
       wrapper.value.push({
-        isAi: true,
+        role: "assistant",
         value: "Loading....",
       });
-      // 測試用，3秒後回覆
-      const res = await waitThreeSeconds();
-      // 向openAi 發請求，等回復
-      wrapper.value.pop(); // 收到回覆後將 loading 窗刪掉
+
+      // 向 openAi發請請求
+      console.log("向gpt發出請求");
+      const aiResResult = await apiAuth.patch(
+        "/conversation/" + Conversation_Id.value + "/response",
+      );
+      console.log(aiResResult);
+
+      wrapper.value.pop(); // 收到ai回覆後將 loading 窗刪掉
       // push Ai的回答
       wrapper.value.push({
-        isAi: true,
-        value: res,
-      });
-
-      // 後openAi 後端發送請求
-      // const res = await fetch("http://localhost:8000", {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify({
-      //     question: question.value,
-      //   }),
-      // });
-      // //console.log(res);
-      // const data = await res.json();
-      // const parseData = data.bot.trim();
-      // wrapper.pop();
-      // wrapper.push({
-      //   isAi: true,
-      //   value: parseData,
-      // });
-
-      // console.log(parseData);
+        role: "assistant",
+        value:
+          aiResResult.data.result.history[aiResResult.data.result.history - 1]
+            .content,
+      }); // 取得history 中最近一個object
     } catch (error) {
       console.log("向後端傳送修改請求，失敗");
       console.log(error);
@@ -184,11 +170,15 @@ export const useConversationsStore = defineStore("conversations", () => {
     });
   };
   // 清除 FormData
-  const clearFormData = () => {
-    console.log("刪除fd的role & content");
-    // 環圈並删除所有keys
-    for (const key of fd.keys()) {
-      fd.delete(key);
+  const clearFormData = (formData) => {
+    if (formData.keys().length > 0) {
+      console.log("刪除fd的role & content");
+      // 環圈並删除所有keys
+      for (const key of formData.keys()) {
+        fd.delete(key);
+      }
+    } else {
+      console.log("fd是空的不用清空");
     }
   };
 
