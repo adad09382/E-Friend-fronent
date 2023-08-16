@@ -1,76 +1,42 @@
 <template>
-  <v-row class="h-100 no-gutters elevation-4">
-    <!-- <v-col cols="12">
-      <h2>{{ $route.params.id }}</h2>
-      <p>{{ conversation }}</p>
-    </v-col> -->
-    <!-- 對話聊天視窗選單 -->
-    <v-col
-      cols="3"
-      sm="2"
-      class="flex-grow-1 flex-shrink-0"
-      style="border-right: 1px solid #0000001f"
-    >
-      <v-responsive class="overflow-y-auto fill-height" height="500">
-        <v-list subheader>
-          <template
-            v-for="(item, index) in conversations"
-            :key="conversations._id"
-          >
-            <v-list-item :to="item._id">
-              <v-list-item-title v-text="item.topic" />
-            </v-list-item>
-            <v-divider class="my-0" />
-          </template>
-        </v-list>
-      </v-responsive>
-    </v-col>
-
+  <!-- 對話聊天視窗選單 -->
+  <v-list class="conversation-list">
+    <template v-for="(item, index) in conversations" :key="conversations._id">
+      <v-list-item :to="item._id">
+        <v-list-item-title v-text="item.topic" />
+      </v-list-item>
+      <v-divider class="my-0" />
+    </template>
+  </v-list>
+  <v-row class="chat-container">
     <!-- 對話內容框 -->
-    <v-col cols="10" class="flex-grow-1 flex-shrink-0">
-      <v-responsive class="overflow-y-hidden fill-height" height="500">
-        <v-card flat class="d-flex flex-column fill-height">
-          <!-- 使用 v-for 創建迴圈，每个 chat object和索引作為参数 -->
-          <!-- 若 chat.isAi 為 true，添加一個名為 ai 的 class -->
-          <v-card-text>
-            <template
-              v-for="(chat, i) in wrapper"
-              :key="i"
-              :class="{
-                ai: chat.role === 'assistant',
-                'flex-shrink-1': true,
-                'overflow-y-auto': true,
-                wrapper: true,
-              }"
-            >
-              <!-- 將chat object 傳遞給子組件Chat使用  -->
-              <Chat :chat="chat" /> </template
-          ></v-card-text>
-          <v-card-text class="flex-grow-0">
-            <v-text-field
-              v-model="question"
-              label="type_a_message"
-              type="text"
-              no-details
-              outlined
-              append-inner-icon="mdi-send"
-              @click:append-inner="fetchAnswer"
-              @keyup.enter="fetchAnswer"
-              :append-icon="
-                audioRunning ? 'mdi-microphone-off' : 'mdi-microphone'
-              "
-              @click:append="startRecordAndRecognition"
-              hide-details
-            ></v-text-field>
-          </v-card-text>
-        </v-card>
-      </v-responsive>
+    <v-col class="chat-content">
+      <v-card flat class="chat-card">
+        <!-- 使用 v-for 創建迴圈，每个 chat object和索引作為参数 -->
+        <!-- 若 chat.isAi 為 true，添加一個名為 ai 的 class -->
+        <v-card-text class="chat-text">
+          <template v-for="(chat, i) in wrapper" :key="i">
+            <!-- 將chat object 傳遞給子組件Chat使用  -->
+            <Chat v-bind="chat" /> </template
+        ></v-card-text>
+        <v-card-text class="input-field">
+          <v-text-field
+            v-model="question"
+            label="type_a_message"
+            type="text"
+            outlined
+            append-inner-icon="mdi-send"
+            @click:append-inner="fetchAnswer"
+            @keyup.enter="fetchAnswer"
+            :append-icon="
+              audioRunning ? 'mdi-microphone-off' : 'mdi-microphone'
+            "
+            @click:append="startRecordAndRecognition"
+            hide-details
+          ></v-text-field>
+        </v-card-text>
+      </v-card>
     </v-col>
-    <!-- <v-col cols="12">
-      <div>Audio Field</div>
-      <v-divider></v-divider>
-      <audio v-if="audioUrl" controls :src="audioUrl"></audio>
-    </v-col> -->
   </v-row>
 </template>
 
@@ -146,3 +112,54 @@ watch(
   }
 })();
 </script>
+
+<style scoped>
+.conversation-list {
+  overflow-y: scroll;
+  height: 100vh;
+  width: 15%;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 1000;
+  margin-top: 64px;
+}
+
+.chat-container {
+  height: 100% !important;
+}
+.chat-content {
+  flex-grow: 1;
+  flex-shrink: 0;
+  margin-left: 20%;
+}
+
+.chat-responsive {
+  overflow-y: hidden;
+  height: 500px;
+}
+
+.chat-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.chat-text {
+  height: 500px;
+  overflow-y: auto;
+}
+
+.input-field {
+  flex-grow: 0;
+}
+
+.ai {
+  /* 這裡可以添加 AI 聊天消息的樣式 */
+}
+
+.wrapper {
+  flex-shrink: 1;
+  overflow-y: auto;
+}
+</style>

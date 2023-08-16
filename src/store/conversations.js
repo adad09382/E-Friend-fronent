@@ -136,7 +136,7 @@ export const useConversationsStore = defineStore("conversations", () => {
       // 讓聊天窗出現Loading
       wrapper.value.push({
         role: "assistant",
-        value: "Loading....",
+        content: "Loading....",
       });
 
       // 向 openAi發請請求
@@ -150,9 +150,10 @@ export const useConversationsStore = defineStore("conversations", () => {
       // push Ai的回答
       wrapper.value.push({
         role: "assistant",
-        value:
-          aiResResult.data.result.history[aiResResult.data.result.history - 1]
-            .content,
+        content:
+          aiResResult.data.result.history[
+            aiResResult.data.result.history.length - 1
+          ].content,
       }); // 取得history 中最近一個object
     } catch (error) {
       console.log("向後端傳送修改請求，失敗");
@@ -171,17 +172,16 @@ export const useConversationsStore = defineStore("conversations", () => {
   };
   // 清除 FormData
   const clearFormData = (formData) => {
-    if (formData.keys().length > 0) {
+    const keysArray = [...formData.keys()]; // 將迭代器轉換為數組
+    if (keysArray.length > 0) {
       console.log("刪除fd的role & content");
-      // 環圈並删除所有keys
-      for (const key of formData.keys()) {
-        fd.delete(key);
+      for (const key of keysArray) {
+        formData.delete(key);
       }
     } else {
       console.log("fd是空的不用清空");
     }
   };
-
   // ================== 同時調用錄音與語音識別用變數與Function ==================
   const audioRunning = ref(false); // 是否正在錄音的狀態
   /*

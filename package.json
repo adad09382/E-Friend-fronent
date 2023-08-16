@@ -18,6 +18,7 @@
     "pinia": "^2.0.0",
     "pinia-plugin-persistedstate": "^3.2.0",
     "roboto-fontface": "*",
+    "swiper": "^10.1.0",
     "validator": "^13.9.0",
     "vee-validate": "^4.10.8",
     "vue": "^3.2.0",

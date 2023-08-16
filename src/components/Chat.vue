@@ -1,72 +1,79 @@
 <template>
   <div class="chat" ref="currentMessage">
-    <!-- 如果chat.role === 'assistant' 為 false，顯示用户的訊息 -->
-    <template v-if="chat.role !== 'assistant'">
+    <!-- 如果role === 'assistant' 為 false，顯示用户的訊息 -->
+    <template v-if="role !== 'assistant'">
       <div class="message" style="text-align: end">
-        <template v-if="chat?.audioLink">
-          <audio :src="chat?.audioLink" controls></audio>
+        <template v-if="audioLink">
+          <audio :src="audioLink" controls></audio>
         </template>
         <div class="audio-text">
-          <span v-show="!active"> {{ chat.content }} </span>
+          <span v-show="!active"> {{ content }} </span>
           <button class="btn" @click="active = !active">文</button>
         </div>
       </div>
       <div class="profile">
-        <!-- 根據chat.role === 'assistant' 的值顯示不同的頭貼圖片 -->
+        <!-- 根據role === 'assistant' 的值顯示不同的頭貼圖片 -->
         <img src="@/assets/user.svg" alt="" />
       </div>
     </template>
-    <!-- 如果chat.role === 'assistant' 為 true，顯示AI回覆的的訊息 -->
+    <!-- 如果role === 'assistant' 為 true，顯示AI回覆的的訊息 -->
     <template v-else>
       <div class="profile" style="background-color: #19c37d">
         <img src="@/assets/bot.svg" alt="" />
       </div>
-      <div class="message">
-        <!-- 音訊播放器的主容器 -->
-        <div class="audio-player" ref="audioPlayer">
-          <!-- 控制區域 -->
-          <div class="controls">
-            <div class="play-container">
-              <!-- 播放/暫停按鈕 -->
-              <v-icon
-                @click="throttledPlayAiResponse"
-                :icon="
-                  playingState === speechSynthesisState.start
-                    ? 'mdi-pause'
-                    : 'mdi-play'
-                "
-                size="x-large"
-              ></v-icon>
-            </div>
-            <!-- 顯示目前時間和音訊總長度 -->
-            <div class="time">
-              <div class="current">{{ currentTime }}</div>
-              <div class="divider">/</div>
-              <div class="length">{{ duration }}</div>
-            </div>
-            <!-- 音量控制區塊 -->
-            <div class="volume-container">
-              <div class="volume-button">
-                <!-- 音量圖示 -->
+      <template v-if="content === 'Loading....'">
+        <div class="message">
+          <div class="audio-text">{{ content }}</div>
+        </div>
+      </template>
+      <template v-else>
+        <div class="message">
+          <!-- 音訊播放器的主容器 -->
+          <div class="audio-player" ref="audioPlayer">
+            <!-- 控制區域 -->
+            <div class="controls">
+              <div class="play-container">
+                <!-- 播放/暫停按鈕 -->
                 <v-icon
-                  class="volume"
-                  icon="mdi-volume-high"
+                  @click="throttledPlayAiResponse"
+                  :icon="
+                    playingState === speechSynthesisState.start
+                      ? 'mdi-pause'
+                      : 'mdi-play'
+                  "
                   size="x-large"
                 ></v-icon>
               </div>
-              <!-- 音量滑動條 -->
-              <div class="volume-slider">
-                <!-- 表示當前音量的區塊 -->
-                <div class="volume-percentage"></div>
+              <!-- 顯示目前時間和音訊總長度 -->
+              <div class="time">
+                <div class="current">{{ currentTime }}</div>
+                <div class="divider">/</div>
+                <div class="length">{{ duration }}</div>
+              </div>
+              <!-- 音量控制區塊 -->
+              <div class="volume-container">
+                <div class="volume-button">
+                  <!-- 音量圖示 -->
+                  <v-icon
+                    class="volume"
+                    icon="mdi-volume-high"
+                    size="x-large"
+                  ></v-icon>
+                </div>
+                <!-- 音量滑動條 -->
+                <div class="volume-slider">
+                  <!-- 表示當前音量的區塊 -->
+                  <div class="volume-percentage"></div>
+                </div>
               </div>
             </div>
           </div>
+          <div class="audio-text">
+            <button class="bot-btn" @click="active = !active">文</button>
+            <span v-show="active"> {{ content }} </span>
+          </div>
         </div>
-        <div class="audio-text">
-          <button class="bot-btn" @click="active = !active">文</button>
-          <span v-show="!active"> {{ chat.content }} </span>
-        </div>
-      </div>
+      </template>
     </template>
   </div>
 </template>
@@ -75,7 +82,9 @@
 import { nextTick, onMounted, ref, reactive, defineProps, watch } from "vue";
 // 定義 chat 屬性，是一個物件(Object)
 const props = defineProps({
-  chat: Object,
+  role: String,
+  content: String,
+  audioLink: String,
 });
 // currentMessage 用於獲取 DOM 元素
 const currentMessage = ref(null);
@@ -171,7 +180,7 @@ const playAiResponse = () => {
     // 創建語音合成檔案 Object
     const toSpeak = new SpeechSynthesisUtterance();
     // 被語音合成內容設定
-    toSpeak.text = props.chat.content; // 將傳進來的props 中的chat object content 輸入為合成內容
+    toSpeak.text = props.content; // 將傳進來的props 中的chat object content 輸入為合成內容
     toSpeak.lang = "en-US"; // 設定合成語言
     toSpeak.voice = voice; // 設定合成語音
     toSpeak.rate = 1.5; // 設置語速，0.1（最慢）到 10（最快）

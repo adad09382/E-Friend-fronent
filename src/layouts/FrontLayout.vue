@@ -1,5 +1,5 @@
 <template>
-  <v-app-bar color="primary">
+  <v-app-bar color="#fff">
     <v-btn :active="false" to="/">
       <v-app-bar-title>E-Friend</v-app-bar-title>
     </v-btn>
