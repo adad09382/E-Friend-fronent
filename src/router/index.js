@@ -19,6 +19,7 @@ const routes = [
           admin: false,
         },
       },
+
       {
         path: "register",
         name: "Register",

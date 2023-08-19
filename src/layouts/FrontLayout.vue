@@ -1,8 +1,10 @@
 <template>
   <v-app-bar color="#fff">
     <v-btn :active="false" to="/">
-      <v-app-bar-title>E-Friend</v-app-bar-title>
+      <v-app-bar-title class="web-title">E-Friend </v-app-bar-title>
     </v-btn>
+    <span class="web-subtitle"></span>
+
     <v-spacer></v-spacer>
 
     <v-app-bar-nav-icon
@@ -89,6 +91,12 @@ const navItems = computed(() => {
       show: isLogin.value,
     },
     {
+      to: "/news",
+      text: "我的對話",
+      icon: "mdi-forum",
+      show: isLogin.value,
+    },
+    {
       to: "/admin",
       text: "管理",
       icon: "mdi-cog",
@@ -132,3 +140,15 @@ const logout = async () => {
   }
 };
 </script>
+
+<style scoped>
+.web-title {
+  color: #f04e37;
+  font-size: 2rem;
+}
+
+.web-subtitle {
+  margin-top: 0.5rem;
+  color: #f04e37;
+}
+</style>

@@ -8,6 +8,7 @@
       <v-divider class="my-0" />
     </template>
   </v-list>
+  <!-- 對話內容框 -->
   <v-row class="chat-container">
     <!-- 對話內容框 -->
     <v-col class="chat-content">
@@ -38,6 +39,27 @@
       </v-card>
     </v-col>
   </v-row>
+  <!-- dialog -->
+  <button class="promptBtn" @click="dialog = !dialog">P</button>
+
+  <div class="text-center">
+    <v-dialog v-model="dialog" activator="parent" width="auto">
+      <v-card>
+        <v-card-text>
+          <b>Situation</b> <br />
+          {{ promptSituation }} <br />
+          <b>Object</b> <br />
+
+          {{ promptObject }}</v-card-text
+        >
+        <v-card-actions>
+          <v-btn color="primary" block @click="dialog = false"
+            >Close Dialog</v-btn
+          >
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+  </div>
 </template>
 
 <script setup>
@@ -53,7 +75,7 @@ import { useSpeechRecognition } from "@vueuse/core";
 
 const route = useRoute();
 const createSnackbar = useSnackbar();
-
+const dialog = ref(false);
 const conversationsStore = useConversationsStore();
 // 引入ConversationsStore 中的指定變數
 const {
@@ -89,6 +111,57 @@ watch(
     findConversationIdHistory(newId); //  route 路徑改變改變時，取得改變後的history
   },
 );
+
+// 每頁的Prompt，要依據每頁route 去找history
+const promptSituation = computed(() => {
+  const foundHistory = conversations.value.find(
+    (conversation) => conversation._id === Conversation_Id.value,
+  );
+
+  if (
+    !foundHistory ||
+    !foundHistory.history[0] ||
+    !foundHistory.history[0].content
+  ) {
+    return null;
+  }
+
+  const content = foundHistory.history[0].content;
+  const startSituation = content.indexOf("Situation:");
+  const startObjective = content.indexOf("Objective:");
+
+  if (startSituation !== -1 && startObjective !== -1) {
+    return content
+      .substring(startSituation + "Situation:".length, startObjective)
+      .trim();
+  }
+
+  return null;
+});
+
+const promptObject = computed(() => {
+  const foundHistory = conversations.value.find(
+    (conversation) => conversation._id === Conversation_Id.value,
+  );
+
+  if (
+    !foundHistory ||
+    !foundHistory.history[0] ||
+    !foundHistory.history[0].content
+  ) {
+    return null;
+  }
+
+  const content = foundHistory.history[0].content;
+  const startObjective = content.indexOf("Objective:");
+  const end = content.indexOf("Note:");
+
+  if (startObjective !== -1 && end !== -1) {
+    return content.substring(startObjective + "Objective:".length, end).trim();
+  }
+
+  return null;
+});
 // 立即執行函式，去後端撈數據
 // 撈到指定用戶的所有conversation
 // 還要將指定conversation 中的history 呈現在頁面
@@ -117,7 +190,7 @@ watch(
 .conversation-list {
   overflow-y: scroll;
   height: 100vh;
-  width: 15%;
+  width: 20%;
   position: fixed;
   left: 0;
   top: 0;
@@ -132,6 +205,7 @@ watch(
   flex-grow: 1;
   flex-shrink: 0;
   margin-left: 20%;
+  height: 100% !important;
 }
 
 .chat-responsive {
@@ -161,5 +235,15 @@ watch(
 .wrapper {
   flex-shrink: 1;
   overflow-y: auto;
+}
+
+.promptBtn {
+  position: fixed;
+  top: 82%;
+  right: 1%;
+  font-size: 0.25rem;
+  padding: 0.05rem 0.45rem;
+  border: 1px solid black;
+  border-radius: 80%;
 }
 </style>

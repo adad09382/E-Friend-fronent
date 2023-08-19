@@ -23,85 +23,35 @@
       </swiper>
     </v-col>
     <!-- 6大優勢 -->
-    <v-col cols="12">
-      <h1 class="text-center">
-        不限時間，不限地點 <br />
-        <span style="color: #1185c6"> 一天24小時， 一年365天 </span>
-      </h1>
-      <v-container>
-        <br />
-        <v-row>
-          <v-col cols="4" class="d-flex justify-center">
-            <div class="d-flex align-center">
-              <img
-                src="https://engoo.com.tw/assets/general/homepage/advantage-icon-01.svg"
-              />
-              <div class="margin-left">
-                <b>AI一對一 </b> <br />
-                英文對話
+    <v-col cols="12" class="d-flex flex-column align-center">
+      <v-col cols="10">
+        <h1 class="text-center">
+          不限時間，不限地點 <br />
+          <span style="color: #f04e37"> 一天24小時， 一年365天 </span>
+        </h1>
+        <v-container>
+          <br />
+          <v-row>
+            <v-col
+              cols="6"
+              sm="4"
+              class="d-flex justify-center"
+              v-for="(advantage, index) in advantages"
+              :key="index"
+            >
+              <div class="d-flex align-center">
+                <img :src="advantage.img" />
+                <div class="margin-left">
+                  <b>{{ advantage.title }} </b> <br />
+                  {{ advantage.description }}
+                </div>
               </div>
-            </div></v-col
-          ><v-col cols="4" class="d-flex justify-center">
-            <div class="d-flex align-center">
-              <img
-                src="https://engoo.com.tw/assets/general/homepage/advantage-icon-04.svg"
-              />
-              <div class="margin-left">
-                <b>對話不受限 </b> <br />
-                不同需求及興趣
-              </div>
-            </div></v-col
-          >
-          <v-col cols="4" class="d-flex justify-center">
-            <div class="d-flex align-center">
-              <img
-                src="https://engoo.com.tw/assets/general/homepage/advantage-icon-03.svg"
-              />
-              <div class="margin-left">
-                <b>AI可成為任何老師 </b> <br />
-                任何英語學習問題都可以
-              </div>
-            </div></v-col
-          >
-        </v-row>
-        <v-row>
-          <v-col cols="4" class="d-flex justify-center">
-            <div class="d-flex align-center">
-              <img
-                src="https://engoo.com.tw/assets/general/homepage/advantage-icon-02.svg"
-              />
-              <div class="margin-left">
-                <b>隨時隨地 </b> <br />
-                線上學習
-              </div>
-            </div></v-col
-          >
-
-          <v-col cols="4" class="d-flex justify-center">
-            <div class="d-flex align-center">
-              <img
-                src="https://engoo.com.tw/assets/general/homepage/advantage-icon-05.svg"
-              />
-              <div class="margin-left">
-                <b>無需下載軟體 </b> <br />
-                讓學習變更簡單
-              </div>
-            </div></v-col
-          >
-          <v-col cols="4" class="d-flex justify-center">
-            <div class="d-flex align-center">
-              <img
-                src="https://engoo.com.tw/assets/general/homepage/advantage-icon-06.svg"
-              />
-              <div class="margin-left">
-                <b>新聞英語學習 </b> <br />
-                獲得新消息時也不忘學習
-              </div>
-            </div></v-col
-          >
-        </v-row>
-      </v-container>
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-col>
     </v-col>
+
     <v-divider></v-divider>
     <!-- 教材 -->
     <v-col cols="12">
@@ -112,116 +62,36 @@
       <br />
       <v-container>
         <v-row class="d-flex justify-center">
-          <v-col cols="4">
+          <v-col cols="12">
             <h2 class="text-center margin-button-1rem">各式對話主題</h2>
             <div class="d-flex flex-wrap justify-center">
-              <div class="smallCard d-flex flex-column">
+              <div
+                class="smallCard d-flex flex-column"
+                v-for="(card, index) in cards"
+                :key="card.title"
+              >
                 <div class="img">
-                  <img
-                    src="https://engoo.com.tw/assets/general/homepage/materials-oren-01.svg"
-                    alt=""
-                  />
+                  <img :src="card.img" alt="" />
                 </div>
                 <div class="text">
-                  <div class="title">日常對話</div>
-                </div>
-              </div>
-              <div class="smallCard d-flex flex-column">
-                <div class="img">
-                  <img
-                    src="https://engoo.com.tw/assets/general/homepage/materials-oren-03.svg"
-                    alt=""
-                  />
-                </div>
-                <div class="text">
-                  <div class="title">興趣對話</div>
-                </div>
-              </div>
-              <div class="smallCard d-flex flex-column">
-                <div class="img">
-                  <img
-                    src="https://engoo.com.tw/assets/general/homepage/materials-oren-04.svg"
-                    alt=""
-                  />
-                </div>
-                <div class="text">
-                  <div class="title">旅遊對話</div>
-                </div>
-              </div>
-              <div class="smallCard d-flex flex-column">
-                <div class="img">
-                  <img
-                    src="https://engoo.com.tw/assets/general/homepage/materials-oren-02.svg"
-                    alt=""
-                  />
-                </div>
-                <div class="text">
-                  <div class="title">職場對話</div>
-                </div>
-              </div>
-              <div class="smallCard d-flex flex-column">
-                <div class="img">
-                  <img
-                    src="https://engoo.com.tw/assets/general/homepage/materials-oren-06.svg"
-                    alt=""
-                  />
-                </div>
-                <div class="text">
-                  <div class="title">考試對話</div>
-                </div>
-              </div>
-              <div class="smallCard d-flex flex-column">
-                <div class="img">
-                  <img
-                    src="https://engoo.com.tw/assets/general/homepage/materials-oren-05.svg"
-                    alt=""
-                  />
-                </div>
-                <div class="text">
-                  <div class="title">情境對話</div>
+                  <div class="title">{{ card.title }}</div>
                 </div>
               </div>
             </div>
           </v-col>
-          <v-col cols="8">
+          <v-col cols="10">
             <h2 class="text-center margin-button-1rem">和AI一起聊新聞</h2>
-            <div class="card d-flex">
+            <div
+              class="card d-flex"
+              v-for="(article, index) in articles"
+              :key="index"
+            >
               <div class="text">
-                <div class="title">
-                  Popular Curry Spices Used in Vietnam 2,000 Years Ago
-                </div>
-                <div class="subtitle">10 hrs ago</div>
+                <div class="title">{{ article.title }}</div>
+                <div class="subtitle">{{ article.subtitle }}</div>
               </div>
               <div class="img">
-                <img
-                  src="https://assets.app.engoo.com/images/7S2YjK0ULyaB1GjVaQCutZ.jpeg"
-                  alt=""
-                />
-              </div>
-            </div>
-            <div class="card d-flex">
-              <div class="text">
-                <div class="title">No Fire Left: How to Deal with Burnout</div>
-                <div class="subtitle">10 hrs ago</div>
-              </div>
-              <div class="img">
-                <img
-                  src="https://assets.app.engoo.com/images/6y14Hpp4yd0veONv7jmgSl.jpeg"
-                />
-              </div>
-            </div>
-            <div class="card d-flex">
-              <div class="text">
-                <div class="title">
-                  DiCaprio to Fund Climate Education at Former School
-                </div>
-                <div class="subtitle">10 hrs ago</div>
-              </div>
-              <div class="img">
-                <img
-                  src="https://assets.app.engoo.com/images/6Rx47EkBtKFPZuGpqcdiGT.jpeg"
-                  alt=""
-                />
+                <img :src="article.img" alt="" />
               </div>
             </div>
           </v-col>
@@ -229,69 +99,114 @@
       </v-container>
     </v-col>
     <v-divider></v-divider>
-    <!-- 學員心得 -->
-    <v-container class="d-flex justify-center">
-      <v-row class="d-flex justify-center">
-        <v-col cols="4" class="d-flex justify-center">
-          <div class="peopleCard d-flex flex-column">
-            <div class="img">
-              <img
-                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT81w87VsQPFcLq--52KYuIWVw7h0Cmvy1dDEdaPgNwJf-67gkyHLuztnb-uUNP28X9o1Y"
-                alt=""
-              />
+    <!-- 一起學英文 + 學員心得 -->
+    <v-col class="bg-F6F9FA" cols="12">
+      <v-container class="d-flex flex-column align-center">
+        <!-- 一起學英文 -->
+        <v-col cols="12">
+          <v-container class="d-flex flex-column align-center">
+            <h1>一起到E-Friend學英語吧</h1>
+            <div
+              class="text-center line-height"
+              style="font-size: 1.25rem; margin: 1.5rem 0"
+            >
+              多種主題會話、商務英語、檢定英語，滿足不同的學習需求，
+              <br />
+              採用AI在線上即時與學員互動，強化學員口語表達能力，
+              <br />
+              以「聽說」帶動「讀寫」，一步一步提升您的英語力！
             </div>
-            <div class="text">
-              <p class="career">科學家</p>
-              <p class="experience">
-                我的工作內容需要使用大量英文溝通，看英文文獻或是和海外組織溝通什麼的，E-Friend提供了很多實用的口語交流練習機會...
-              </p>
-              <p class="name">SHERRY</p>
-            </div>
-          </div>
+          </v-container>
         </v-col>
-        <v-col cols="4" class="d-flex justify-center">
-          <div class="peopleCard d-flex flex-column">
-            <div class="img">
-              <img
-                src="https://s3.amazonaws.com/comicgeeks/characters/avatars/34503.jpg"
-                alt=""
-              />
-            </div>
-            <div class="text">
-              <p class="career">高中生</p>
-              <p class="experience">
-                學校上課教的內容真的太無聊了，上課內容制式，時間長，不像E-Friend可以想聊什麼就聊什麼，AI也十分尊敬我這個電鋸人大人...
-              </p>
-              <p class="name">Denji</p>
-            </div>
-          </div>
+        <!-- 學員心得 -->
+        <v-col cols="10">
+          <h1 class="text-center">
+            學員 <span style="color: #f04e37"> 心得分享 </span><br />
+          </h1>
+          <br />
+          <v-row class="d-flex justify-center">
+            <v-col
+              cols="12"
+              sm="6"
+              md="4"
+              lg="3"
+              class="d-flex justify-center"
+              v-for="(person, index) in people"
+              :key="index"
+            >
+              <div class="peopleCard d-flex flex-column">
+                <div class="img">
+                  <img :src="person.img" alt="" />
+                </div>
+                <div class="text">
+                  <p class="career">{{ person.career }}</p>
+                  <p class="experience">{{ person.experience }}</p>
+                  <p class="name">{{ person.name }}</p>
+                </div>
+              </div>
+            </v-col>
+          </v-row>
         </v-col>
-        <v-col cols="4" class="d-flex justify-center">
-          <div class="peopleCard d-flex flex-column">
-            <div class="img">
-              <img
-                src="https://upload.wikimedia.org/wikipedia/zh/6/61/Naruto_20160925.jpg"
-                alt=""
-              />
-            </div>
-            <div class="text">
-              <p class="career">公務員</p>
-              <p class="experience">
-                E-Friend真的很適合在家自學的人，時間又彈性，想和AI聊天就聊天，有事關掉，完全沒有壓力。可以選擇自己想要的主題，或是跟AI來個天南地北的Free
-                Talk...
-              </p>
-              <p class="name">NARUTO</p>
-            </div>
-          </div>
-        </v-col>
-      </v-row>
-    </v-container>
+      </v-container></v-col
+    >
   </v-row>
+  <v-footer>
+    <v-row justify="center" no-gutters>
+      <v-btn color="black" variant="text" rounded="xl" to="/" :active="false"
+        >HOME</v-btn
+      >
+      <v-btn color="black" variant="text" rounded="xl" @click="openDialog"
+        >CONTACT US</v-btn
+      >
+
+      <v-col class="text-center" cols="12">
+        {{ new Date().getFullYear() }} — <strong>E-Friend</strong>
+        <a
+          :href="'https://github.com/adad09382'"
+          target="_blank"
+          class="footerIcon"
+        >
+          <v-icon> mdi-github </v-icon>
+        </a>
+      </v-col>
+      <v-col cols="12">
+        <div style="color: black" class="text-center">
+          <b>
+            本專案為磨練技術用的sideProject，無商業利用意圖，若有侵權疑慮，請立即Email與我聯繫
+          </b>
+          <br />
+          wadelinbtc@gmail.com
+        </div>
+      </v-col>
+    </v-row>
+  </v-footer>
+
+  <!-- Contact Us用的Dialog -->
+  <VDialog width="500px" v-model="dialog">
+    <VForm :disabled="isSubmitting" @submit.prevent="submit">
+      <VCard>
+        <VCardText>
+          <VTextField label="稱呼"></VTextField>
+          <VTextField label="Email信箱"></VTextField>
+          <VTextarea label="意見留言"></VTextarea>
+        </VCardText>
+        <VCardActions>
+          <VSpacer></VSpacer>
+          <VBtn color="red" @click="closeDialog" :loading="isSubmitting"
+            >取消</VBtn
+          >
+          <VBtn color="green" type="submit" :loading="isSubmitting">送出</VBtn>
+        </VCardActions>
+      </VCard>
+    </VForm>
+  </VDialog>
 </template>
 
 <script setup>
-import { onMounted } from "vue";
+import { ref, onMounted } from "vue";
 import { Swiper, SwiperSlide } from "swiper/vue";
+import { useSnackbar } from "vuetify-use-dialog";
+
 import "swiper/css";
 import "swiper/css/effect-fade";
 import "swiper/css/navigation";
@@ -302,7 +217,143 @@ import { EffectFade, Navigation, Pagination, Autoplay } from "swiper/modules";
 
 const modules = [EffectFade, Navigation, Pagination, Autoplay];
 
-// Options for the first Swiper instance
+const createSnackbar = useSnackbar();
+
+// 優勢
+const advantages = ref([
+  {
+    img: "https://engoo.com.tw/assets/general/homepage/advantage-icon-01.svg",
+    title: "AI一對一",
+    description: "英文對話",
+  },
+  {
+    img: "https://engoo.com.tw/assets/general/homepage/advantage-icon-04.svg",
+    title: "對話不受限",
+    description: "不同需求及興趣",
+  },
+  {
+    img: "https://engoo.com.tw/assets/general/homepage/advantage-icon-03.svg",
+    title: "AI可成為任何老師",
+    description: "任何英語學習問題都可以",
+  },
+  {
+    img: "https://engoo.com.tw/assets/general/homepage/advantage-icon-02.svg",
+    title: "隨時隨地",
+    description: "線上學習",
+  },
+  {
+    img: "https://engoo.com.tw/assets/general/homepage/advantage-icon-05.svg",
+    title: "無需下載軟體",
+    description: "讓學習變更簡單",
+  },
+  {
+    img: "https://engoo.com.tw/assets/general/homepage/advantage-icon-06.svg",
+    title: "新聞英語學習",
+    description: "獲得新消息時也不忘學習",
+  },
+]);
+// 教材-對話 small card
+const cards = ref([
+  {
+    img: "https://engoo.com.tw/assets/general/homepage/materials-oren-01.svg",
+    title: "日常對話",
+  },
+  {
+    img: "https://engoo.com.tw/assets/general/homepage/materials-oren-03.svg",
+    title: "興趣對話",
+  },
+  {
+    img: "https://engoo.com.tw/assets/general/homepage/materials-oren-04.svg",
+    title: "旅遊對話",
+  },
+  {
+    img: "https://engoo.com.tw/assets/general/homepage/materials-oren-02.svg",
+    title: "職場對話",
+  },
+  {
+    img: "https://engoo.com.tw/assets/general/homepage/materials-oren-06.svg",
+    title: "考試對話",
+  },
+  {
+    img: "https://engoo.com.tw/assets/general/homepage/materials-oren-05.svg",
+    title: "情境對話",
+  },
+]);
+// 教材-文章 card
+const articles = ref([
+  {
+    title: "Popular Curry Spices Used in Vietnam 2,000 Years Ago",
+    subtitle: "10 hrs ago",
+    img: "https://assets.app.engoo.com/images/7S2YjK0ULyaB1GjVaQCutZ.jpeg",
+  },
+  {
+    title: "No Fire Left: How to Deal with Burnout",
+    subtitle: "10 hrs ago",
+    img: "https://assets.app.engoo.com/images/6y14Hpp4yd0veONv7jmgSl.jpeg",
+  },
+  {
+    title: "DiCaprio to Fund Climate Education at Former School",
+    subtitle: "10 hrs ago",
+    img: "https://assets.app.engoo.com/images/6Rx47EkBtKFPZuGpqcdiGT.jpeg",
+  },
+]);
+// 學員心得 card
+const people = ref([
+  {
+    img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT81w87VsQPFcLq--52KYuIWVw7h0Cmvy1dDEdaPgNwJf-67gkyHLuztnb-uUNP28X9o1Y",
+    career: "科學家",
+    experience:
+      "我的工作內容需要使用大量英文溝通，看英文文獻或是和海外組織溝通什麼的，E-Friend提供了很多實用的口語交流練習機會...",
+    name: "SHERRY",
+  },
+  {
+    img: "https://s3.amazonaws.com/comicgeeks/characters/avatars/34503.jpg",
+    career: "高中生",
+    experience:
+      "學校上課教的內容真的太無聊了，上課內容制式，時間長，不像E-Friend可以想聊什麼就聊什麼，AI也十分尊敬我這個電鋸人大人...",
+    name: "Denji",
+  },
+  {
+    img: "https://s3.amazonaws.com/comicgeeks/characters/avatars/34503.jpg",
+    career: "高中生",
+    experience:
+      "學校上課教的內容真的太無聊了，上課內容制式，時間長，不像E-Friend可以想聊什麼就聊什麼，AI也十分尊敬我這個電鋸人大人...",
+    name: "Denji",
+  },
+
+  {
+    img: "https://upload.wikimedia.org/wikipedia/zh/6/61/Naruto_20160925.jpg",
+    career: "公務員",
+    experience:
+      "E-Friend真的很適合在家自學的人，時間又彈性，想和AI聊天就聊天，有事關掉，完全沒有壓力。可以選擇自己想要的主題，或是跟AI來個天南地北的Free Talk...",
+    name: "NARUTO",
+  },
+  // 更多人物資料...
+]);
+//Contact Us用的Dialog
+// 表單對話框
+const dialog = ref(false);
+const dialogId = ref("");
+const openDialog = () => {
+  dialogId.value = "";
+  dialog.value = true;
+};
+const closeDialog = () => {
+  dialog.value = false;
+};
+
+const submit = () => {
+  createSnackbar({
+    text: "感謝您的寶貴意見！",
+    showCloseButton: false,
+    snackbarProps: {
+      timeout: 2000,
+      color: "green",
+      location: "bottom",
+    },
+  });
+  closeDialog();
+};
 </script>
 
 <style scoped>
@@ -344,13 +395,13 @@ const modules = [EffectFade, Navigation, Pagination, Autoplay];
   text-align: center;
 }
 .card {
-  margin: 1.25rem 0.5rem;
+  margin: 1.25rem 2.5rem;
   border: 0.5px solid #eee;
   box-shadow: 1px 2px 2px #aaa;
   height: 120px;
 }
 .card .text {
-  width: 65%;
+  width: 80%;
 }
 
 .card .text .title {
@@ -367,7 +418,7 @@ const modules = [EffectFade, Navigation, Pagination, Autoplay];
   color: #aaa;
 }
 .card .img {
-  width: 35%;
+  width: 20%;
 }
 .card .img img {
   width: 100%;
@@ -405,5 +456,18 @@ const modules = [EffectFade, Navigation, Pagination, Autoplay];
   color: #aaa;
 }
 .peopleCard .name {
+}
+
+.bg-F6F9FA {
+  background: #f6f9fa;
+}
+
+.footerIcon {
+  padding-left: 1rem;
+  color: black;
+}
+
+.line-height {
+  line-height: 2.5rem;
 }
 </style>

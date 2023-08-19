@@ -41,7 +41,7 @@
   </VContainer>
 
   <!-- 新增話題用的Dialog -->
-  <VDialog persistent width="500px" v-model="dialog">
+  <VDialog class="dialog" persistent width="500px" v-model="dialog" scrollable>
     <VForm :disabled="isSubmitting" @submit.prevent="submit">
       <VCard>
         <VCardTitle>{{
@@ -58,17 +58,7 @@
             v-model="content.value.value"
             :error-messages="content.errorMessage.value"
           ></VTextarea>
-          <VSelect
-            label="分類"
-            v-model="category.value.value"
-            :error-messages="category.errorMessage.value"
-            :items="categories"
-          ></VSelect>
-          <VCheckbox
-            label="啟用話題"
-            v-model="active.value.value"
-            :error-messages="active.errorMessage.value"
-          ></VCheckbox>
+
           <VueFileAgent
             v-model="files"
             v-model:raw-model-value="rawFiles"
@@ -81,14 +71,30 @@
             deletable
             ref="fileAgent"
           ></VueFileAgent>
+          <VCardText class="d-flex justify-end padding-0">
+            <VSelect
+              label="分類"
+              v-model="category.value.value"
+              :error-messages="category.errorMessage.value"
+              :items="categories"
+            ></VSelect>
+            <VCheckbox
+              label="啟用話題"
+              v-model="active.value.value"
+              :error-messages="active.errorMessage.value"
+            ></VCheckbox
+          ></VCardText>
+
+          <VCardActions>
+            <VSpacer></VSpacer>
+            <VBtn color="red" @click="closeDialog" :loading="isSubmitting"
+              >取消</VBtn
+            >
+            <VBtn color="green" type="submit" :loading="isSubmitting"
+              >送出</VBtn
+            >
+          </VCardActions>
         </VCardText>
-        <VCardActions>
-          <VSpacer></VSpacer>
-          <VBtn color="red" @click="closeDialog" :loading="isSubmitting"
-            >取消</VBtn
-          >
-          <VBtn color="green" type="submit" :loading="isSubmitting">送出</VBtn>
-        </VCardActions>
       </VCard>
     </VForm>
   </VDialog>
@@ -235,20 +241,29 @@ const submit = handleSubmit(async (values) => {
     if (dialogId.value.length > 0) {
       console.log("開始修改prompt(前端)");
       await apiAuth.patch("/prompts/" + dialogId.value, fd);
+      createSnackbar({
+        text: "修改prompt成功",
+        showCloseButton: false,
+        snackbarProps: {
+          timeout: 2000,
+          color: "green",
+          location: "bottom",
+        },
+      });
     } else {
       console.log("開始新增prompt (前端)");
 
       await apiAuth.post("/prompts", fd);
+      createSnackbar({
+        text: "新增prompt成功",
+        showCloseButton: false,
+        snackbarProps: {
+          timeout: 2000,
+          color: "green",
+          location: "bottom",
+        },
+      });
     }
-    createSnackbar({
-      text: "新增成功",
-      showCloseButton: false,
-      snackbarProps: {
-        timeout: 2000,
-        color: "green",
-        location: "bottom",
-      },
-    });
     closeDialog();
     tableLoadItems();
   } catch (error) {
@@ -265,3 +280,9 @@ const submit = handleSubmit(async (values) => {
   }
 });
 </script>
+
+<style scoped>
+.padding-0 {
+  padding: 1rem 0 0;
+}
+</style>
