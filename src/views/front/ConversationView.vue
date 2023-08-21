@@ -1,7 +1,7 @@
 <template>
   <!-- 對話聊天視窗選單 -->
   <v-list class="conversation-list">
-    <template v-for="(item, index) in conversations" :key="conversations._id">
+    <template v-for="(item, index) in sortedConversations" :key="item._id">
       <v-list-item :to="item._id">
         <v-list-item-title v-text="item.topic" />
       </v-list-item>
@@ -21,26 +21,32 @@
             <Chat v-bind="chat" /> </template
         ></v-card-text>
         <v-card-text class="input-field">
+          <button class="promptBtn" @click="dialog = !dialog">P</button>
           <v-text-field
             v-model="question"
             label="type_a_message"
             type="text"
             outlined
             append-inner-icon="mdi-send"
-            @click:append-inner="fetchAnswer"
-            @keyup.enter="fetchAnswer"
+            @click:append-inner="loading ? null : handleChat"
+            @keyup.enter="loading ? null : handleChat"
             :append-icon="
               audioRunning ? 'mdi-microphone-off' : 'mdi-microphone'
             "
-            @click:append="startRecordAndRecognition"
+            @click:append="loading ? null : startRecordAndRecognition"
             hide-details
           ></v-text-field>
         </v-card-text>
       </v-card>
     </v-col>
   </v-row>
+  <!-- 測試audio用 -->
+  <!-- <v-col cols="12">
+        <template v-if="audioUrl">
+          <audio :src="audioUrl" controls></audio>
+        </template>
+      </v-col> -->
   <!-- dialog -->
-  <button class="promptBtn" @click="dialog = !dialog">P</button>
 
   <div class="text-center">
     <v-dialog v-model="dialog" activator="parent" width="auto">
@@ -93,7 +99,8 @@ const {
 const getIdConversation = conversationsStore.getIdConversation;
 const getUserIdAllConversation = conversationsStore.getUserIdAllConversation; // 獲得某UserId的所有Conversation
 const startRecordAndRecognition = conversationsStore.startRecordAndRecognition; //開始錄音與語音識別
-const fetchAnswer = conversationsStore.fetchAnswer;
+const handleChat = conversationsStore.handleChat;
+const fetchAiResponse = conversationsStore.fetchAiResponse;
 const waitThreeSeconds = conversationsStore.waitThreeSeconds;
 const findConversationIdHistory = conversationsStore.findConversationIdHistory;
 // ==============首次進入頁面執行的操作===================
@@ -105,9 +112,10 @@ findConversationIdHistory(Conversation_Id.value); // 取得進入時所在conver
 // 監控路由改變，路由改變時，改變pinia 儲存的當年聊天室id
 watch(
   () => route.params.id,
-  (newId) => {
+  async (newId) => {
     console.log("監控到route路徑改變");
     Conversation_Id.value = newId;
+    await getUserIdAllConversation(); // 獲得指定用戶的所有對話
     findConversationIdHistory(newId); //  route 路徑改變改變時，取得改變後的history
   },
 );
@@ -162,6 +170,14 @@ const promptObject = computed(() => {
 
   return null;
 });
+
+// 聊天列表排序，最後更新排序最上方
+const sortedConversations = computed(() => {
+  return conversations.value.slice().sort((a, b) => {
+    return new Date(b.updatedAt) - new Date(a.updatedAt);
+  });
+});
+
 // 立即執行函式，去後端撈數據
 // 撈到指定用戶的所有conversation
 // 還要將指定conversation 中的history 呈現在頁面
@@ -170,6 +186,10 @@ const promptObject = computed(() => {
     console.log("開始執行IIFE");
     await getUserIdAllConversation(); // 獲得指定用戶的所有對話
     findConversationIdHistory(route.params.id); // 獲得目前對話中的所有history
+    // 如果對話沒有長度的話，讓AI先說話
+    if (wrapper.value.length === 0) {
+      await fetchAiResponse();
+    }
   } catch (error) {
     console.log("前端IIFE失敗");
     console.log(error);
@@ -225,6 +245,7 @@ const promptObject = computed(() => {
 }
 
 .input-field {
+  position: relative;
   flex-grow: 0;
 }
 
@@ -238,9 +259,9 @@ const promptObject = computed(() => {
 }
 
 .promptBtn {
-  position: fixed;
-  top: 82%;
-  right: 1%;
+  position: absolute;
+  top: -5%;
+  right: 1.5%;
   font-size: 0.25rem;
   padding: 0.05rem 0.45rem;
   border: 1px solid black;

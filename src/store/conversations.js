@@ -103,65 +103,137 @@ export const useConversationsStore = defineStore("conversations", () => {
   const loading = ref(false); // ai 是否正在loading回答
   const fd = new FormData(); // 創建一個FormData 作為patch用物件
 
-  // 向後端發送消息
-  const fetchAnswer = async () => {
+  // ================== 向後端發送信息修改 conversation History ==================
+  // const fetchAnswer = async () => {
+  //   try {
+  //     // 若question長度小於三則無法送出
+  //     if (question.value.length < 3) {
+  //       console.log("question的內容小於3");
+  //       return;
+  //     }
+  //     loading.value = true; // 是否正在loading 為 true
+  //     // 向後端發送patch請求，儲存新的聊天紀錄
+  //     // 新增conversation history用的message 用FormData儲存並傳送到後端
+  //     clearFormData(fd); // 每次向後端傳patch前，先清除FormData的殘留
+  //     fd.append("role", "user"); // user 設定
+  //     fd.append("content", question.value); // user內容設定
+  //     console.log("向後端傳送修改請求");
+  //     const { data } = await apiAuth.patch(
+  //       "/conversation/" + Conversation_Id.value,
+  //       fd,
+  //     ); // 向後端傳去新增 conversation history 內容
+  //     const userLastChat = data.result.history[data.result.history.length - 1]; // 取得history 中最近一個object
+  //     const messageRole = userLastChat.role;
+  //     const audioLink = userLastChat?.audioLink;
+  //     // 將用戶傳來的text & audio link 傳進 Chat vue 組件
+  //     wrapper.value.push({
+  //       role: messageRole,
+  //       content: question.value,
+  //       audioLink: audioLink,
+  //     });
+  //     question.value = "";
+
+  //     // 讓聊天窗出現Loading
+  //     wrapper.value.push({
+  //       role: "assistant",
+  //       content: "Loading....",
+  //     });
+
+  //     // 向 openAi發請請求
+  //     console.log("向gpt發出請求");
+  //     const aiResResult = await apiAuth.patch(
+  //       "/conversation/" + Conversation_Id.value + "/response",
+  //     );
+  //     console.log(aiResResult);
+
+  //     wrapper.value.pop(); // 收到ai回覆後將 loading 窗刪掉
+  //     // push Ai的回答
+  //     wrapper.value.push({
+  //       role: "assistant",
+  //       content:
+  //         aiResResult.data.result.history[
+  //           aiResResult.data.result.history.length - 1
+  //         ].content,
+  //     }); // 取得history 中最近一個object
+  //   } catch (error) {
+  //     console.log("向後端傳送修改請求，失敗");
+  //     console.log(error);
+  //   } finally {
+  //     loading.value = false;
+  //   }
+  // };
+  // 用戶送出信息修改conversation History，再由AI修改
+  async function handleChat() {
+    await sendUserMessage();
+    await fetchAiResponse();
+  }
+
+  // 用戶送出信息，將用戶信息新增到conversation History
+  const sendUserMessage = async () => {
     try {
-      // 若question長度小於三則無法送出
       if (question.value.length < 3) {
         console.log("question的內容小於3");
         return;
       }
-      loading.value = true; // 是否正在loading 為 true
-      // 向後端發送patch請求，儲存新的聊天紀錄
-      // 新增conversation history用的message 用FormData儲存並傳送到後端
-      clearFormData(fd); // 每次向後端傳patch前，先清除FormData的殘留
-      fd.append("role", "user"); // user 設定
-      fd.append("content", question.value); // user內容設定
+
+      fd.append("role", "user");
+      fd.append("content", question.value);
       console.log("向後端傳送修改請求");
+
       const { data } = await apiAuth.patch(
         "/conversation/" + Conversation_Id.value,
         fd,
-      ); // 向後端傳去修改 conversation history
-      const userLastChat = data.result.history[data.result.history.length - 1]; // 取得history 中最近一個object
+      );
+
+      const userLastChat = data.result.history[data.result.history.length - 1];
       const messageRole = userLastChat.role;
       const audioLink = userLastChat?.audioLink;
-      // 將用戶傳來的text & audio link 傳進 Chat vue 組件
+
       wrapper.value.push({
         role: messageRole,
         content: question.value,
         audioLink: audioLink,
       });
-      question.value = "";
 
-      // 讓聊天窗出現Loading
+      question.value = "";
+    } catch (error) {
+      console.log("向後端傳送修改請求，失敗");
+      console.log(error);
+    }
+  };
+  // AI回應信息，將AI信息新增到conversation History
+  const fetchAiResponse = async () => {
+    try {
+      loading.value = true;
       wrapper.value.push({
         role: "assistant",
         content: "Loading....",
       });
 
-      // 向 openAi發請請求
       console.log("向gpt發出請求");
+
       const aiResResult = await apiAuth.patch(
         "/conversation/" + Conversation_Id.value + "/response",
       );
       console.log(aiResResult);
 
-      wrapper.value.pop(); // 收到ai回覆後將 loading 窗刪掉
-      // push Ai的回答
+      wrapper.value.pop();
+
       wrapper.value.push({
         role: "assistant",
         content:
           aiResResult.data.result.history[
             aiResResult.data.result.history.length - 1
           ].content,
-      }); // 取得history 中最近一個object
+      });
     } catch (error) {
-      console.log("向後端傳送修改請求，失敗");
+      console.log("獲取AI回覆失敗");
       console.log(error);
     } finally {
       loading.value = false;
     }
   };
+
   // 等待3秒回應的 promise
   const waitThreeSeconds = () => {
     return new Promise((resolve) => {
@@ -250,10 +322,12 @@ export const useConversationsStore = defineStore("conversations", () => {
       Math.random() * 10000,
     )}.webm`;
     const file = new File([blob], uniqueFilename, { type: "audio/webm" }); // 將 Blob object 轉換為 File object
+    // 加入語音前先刪光fd
+    clearFormData(fd);
     // 建立一個 FormData object並將檔案加入到其中
     console.log("將audio/webm加入到FormData中");
     fd.append("audio", file);
-    fetchAnswer();
+    handleChat();
     // 向後端發起Conversation 發起patch，改動該對話的history ，新增message進去
     // console.log(
     //   "後端Conversation 發起patch，改動該對話的history ，新增message object進去",
@@ -263,7 +337,7 @@ export const useConversationsStore = defineStore("conversations", () => {
 
   // ================== VueUse 語音識別用變數與Function ==================
 
-  const lang = ref("zh-TW"); // 設置辨識語言
+  const lang = ref("en-US"); // 設置辨識語言
   const recognitionResult = ref(""); // 用於送往後端的語音辨識結果text
 
   const speech = useSpeechRecognition({
@@ -318,7 +392,8 @@ export const useConversationsStore = defineStore("conversations", () => {
     toggleRecording,
     createAudioFileFromRecordedBlob,
     startRecordAndRecognition, // 開始錄音與識別
-    fetchAnswer, // 文字送出和後端互動
+    handleChat, // 文字送出和後端互動
+    fetchAiResponse, // ai回應更新conversation history
     fd,
   };
 });

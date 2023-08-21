@@ -17,9 +17,18 @@
         }"
         class="mySwiper"
       >
-        <swiper-slide><img src="@/assets/home_topic.jpg" /></swiper-slide>
-        <swiper-slide><img src="@/assets/home_teacher.jpg" /></swiper-slide>
-        <swiper-slide><img src="@/assets/home_news.jpg" /></swiper-slide>
+        <swiper-slide class="home-slide"
+          ><img src="@/assets/home_topic.jpg" />
+          <v-btn class="topic-btn" to="/topic"></v-btn>
+        </swiper-slide>
+        <swiper-slide class="home-slide"
+          ><img src="@/assets/home_teacher.jpg" />
+          <v-btn class="teacher-btn" to="/topic"></v-btn>
+        </swiper-slide>
+        <swiper-slide class="home-slide"
+          ><img src="@/assets/home_news.jpg" />
+          <v-btn class="news-btn" to="/news"></v-btn>
+        </swiper-slide>
       </swiper>
     </v-col>
     <!-- 6大優勢 -->
@@ -62,6 +71,8 @@
       <br />
       <v-container>
         <v-row class="d-flex justify-center">
+          <!-- AI對話 -->
+
           <v-col cols="12">
             <h2 class="text-center margin-button-1rem">各式對話主題</h2>
             <div class="d-flex flex-wrap justify-center">
@@ -79,21 +90,31 @@
               </div>
             </div>
           </v-col>
-          <v-col cols="10">
-            <h2 class="text-center margin-button-1rem">和AI一起聊新聞</h2>
+          <!-- Get新聞 -->
+          <v-col cols="10" class="d-flex flex-column align-center">
+            <h2 class="text-center margin-button">和AI一起聊新聞</h2>
             <div
               class="card d-flex"
-              v-for="(article, index) in articles"
+              v-for="(article, index) in randomArticles"
               :key="index"
             >
               <div class="text">
-                <div class="title">{{ article.title }}</div>
-                <div class="subtitle">{{ article.subtitle }}</div>
+                <a :href="article.url" class="title" target="_blank">{{
+                  article.title
+                }}</a>
+                <div></div>
+                <div class="subtitle">
+                  {{ article.publishedAt.substring(0, 10) }}
+                </div>
+                <div class="content">{{ article.description }}</div>
               </div>
               <div class="img">
-                <img :src="article.img" alt="" />
+                <img :src="article.urlToImage" alt="" />
               </div>
             </div>
+            <v-btn :active="false" @click="getRandomNews" class="margin-top">
+              More News</v-btn
+            >
           </v-col>
         </v-row>
       </v-container>
@@ -206,6 +227,7 @@
 import { ref, onMounted } from "vue";
 import { Swiper, SwiperSlide } from "swiper/vue";
 import { useSnackbar } from "vuetify-use-dialog";
+import axios from "axios";
 
 import "swiper/css";
 import "swiper/css/effect-fade";
@@ -279,24 +301,54 @@ const cards = ref([
     title: "情境對話",
   },
 ]);
-// 教材-文章 card
-const articles = ref([
-  {
-    title: "Popular Curry Spices Used in Vietnam 2,000 Years Ago",
-    subtitle: "10 hrs ago",
-    img: "https://assets.app.engoo.com/images/7S2YjK0ULyaB1GjVaQCutZ.jpeg",
-  },
-  {
-    title: "No Fire Left: How to Deal with Burnout",
-    subtitle: "10 hrs ago",
-    img: "https://assets.app.engoo.com/images/6y14Hpp4yd0veONv7jmgSl.jpeg",
-  },
-  {
-    title: "DiCaprio to Fund Climate Education at Former School",
-    subtitle: "10 hrs ago",
-    img: "https://assets.app.engoo.com/images/6Rx47EkBtKFPZuGpqcdiGT.jpeg",
-  },
-]);
+//  教材-文章 card，從api get NEWS
+
+const totalArticles = ref([]);
+const randomArticles = ref([]);
+const API_KEY = import.meta.env.VITE_NEWS_API;
+const BASE_URL = "https://newsapi.org/v2/top-headlines";
+
+async function getTotalNews(pageSize, page) {
+  console.log("執行get 新聞 ");
+  const params = {
+    country: "us",
+    apiKey: API_KEY,
+    pageSize: pageSize,
+    page: page,
+  };
+  try {
+    const { data } = await axios.get(BASE_URL, { params: params });
+    totalArticles.value = data.articles;
+    getRandomNews();
+  } catch (error) {
+    console.error("Error fetching news count:", error);
+  }
+}
+
+function getRandomNews() {
+  console.log("執行隨機get 3 新聞");
+  if (totalArticles.value.length < 3) {
+    console.log("Not enough articles to select from.");
+    return;
+  }
+  // 創造長度不大於3個set，index值為隨機
+  const randomIndices = new Set();
+  while (randomIndices.size < 3) {
+    const randomIndex = Math.floor(Math.random() * totalArticles.value.length);
+    randomIndices.add(randomIndex);
+  }
+  // 使用隨機index的set從 totalArticles 中提取文章放入 randomArticles。
+  randomArticles.value = [...randomIndices].map(
+    (index) => totalArticles.value[index],
+  );
+}
+// 和news api get 15則新聞，並將其中3則放入 randomArticles
+onMounted(async () => {
+  //重新在隨機放入3則新聞進 randomArticles
+  await getTotalNews(15, 1);
+  // getRandomNews();
+});
+
 // 學員心得 card
 const people = ref([
   {
@@ -366,11 +418,14 @@ const submit = () => {
 .margin-auto {
   margin: auto;
 }
+.margin-top {
+  margin-top: 1rem;
+}
 .margin-left {
   margin-left: 1rem;
 }
-.margin-button-1rem {
-  margin-bottom: 1rem;
+.margin-button {
+  margin-bottom: 0.5rem;
 }
 .smallCard {
   margin: 0.5rem 0.5rem;
@@ -395,30 +450,40 @@ const submit = () => {
   text-align: center;
 }
 .card {
-  margin: 1.25rem 2.5rem;
+  margin: 0.25rem 2.5rem;
   border: 0.5px solid #eee;
   box-shadow: 1px 2px 2px #aaa;
-  height: 120px;
+  min-height: 120px;
 }
 .card .text {
-  width: 80%;
+  width: 75%;
 }
 
 .card .text .title {
-  margin-top: 1rem;
-  margin-left: 1rem;
+  display: block;
+  margin: 1rem 1rem 0 1rem;
   font-weight: bold;
+  color: #000;
+  font-size: 0.85rem;
+  text-decoration: none;
 }
 .card .text .subtitle {
-  margin-top: 0.5rem;
   margin-left: 1rem;
-
   font-weight: bold;
   font-size: 0.75rem;
   color: #aaa;
 }
+.card .text .content {
+  margin-top: 0.5rem;
+  margin-left: 1rem;
+  font-weight: bold;
+  font-size: 0.75rem;
+  color: #000;
+  padding-bottom: 0.5rem;
+}
+
 .card .img {
-  width: 20%;
+  width: 25%;
 }
 .card .img img {
   width: 100%;
@@ -455,8 +520,6 @@ const submit = () => {
   font-size: 0.75rem;
   color: #aaa;
 }
-.peopleCard .name {
-}
 
 .bg-F6F9FA {
   background: #f6f9fa;
@@ -469,5 +532,38 @@ const submit = () => {
 
 .line-height {
   line-height: 2.5rem;
+}
+
+.home-slide {
+  position: relative;
+}
+.topic-btn {
+  position: absolute;
+  top: 65%;
+  left: 55%;
+  width: 17.5%;
+  height: 13%;
+  background: transparent;
+  box-shadow: none;
+  border-radius: 1.5rem;
+}
+.teacher-btn {
+  position: absolute;
+  top: 81%;
+  left: 64%;
+  width: 15%;
+  height: 13%;
+  background: transparent;
+  box-shadow: none;
+  border-radius: 1.5rem;
+}
+.news-btn {
+  position: absolute;
+  top: 50%;
+  left: 22%;
+  width: 14%;
+  height: 10%;
+  background: transparent;
+  box-shadow: none;
 }
 </style>

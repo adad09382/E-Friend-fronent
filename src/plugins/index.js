@@ -18,8 +18,8 @@ export function registerPlugins(app) {
   // 先在 pinia 獲得使用者的store，再依據state 導向
   app
     .use(vuetify)
-    .use(VuetifyUseDialog)
     .use(pinia)
     .use(router)
+    .use(VuetifyUseDialog)
     .use(VueFileAgentNext);
 }
