@@ -227,7 +227,7 @@
 import { ref, onMounted } from "vue";
 import { Swiper, SwiperSlide } from "swiper/vue";
 import { useSnackbar } from "vuetify-use-dialog";
-import axios from "axios";
+import { api } from "@/plugins/axios";
 
 import "swiper/css";
 import "swiper/css/effect-fade";
@@ -305,8 +305,6 @@ const cards = ref([
 
 const totalArticles = ref([]);
 const randomArticles = ref([]);
-const API_KEY = import.meta.env.VITE_NEWS_API;
-const BASE_URL = "https://newsapi.org/v2/top-headlines";
 
 async function getTotalNews(pageSize, page) {
   console.log("執行get 新聞 ");
@@ -345,7 +343,12 @@ function getRandomNews() {
 // 和news api get 15則新聞，並將其中3則放入 randomArticles
 onMounted(async () => {
   //重新在隨機放入3則新聞進 randomArticles
-  await getTotalNews(15, 1);
+  // await getTotalNews(15, 1);
+  const { data } = await api.get("/news");
+  console.log(data);
+  console.log(data.data.articles);
+  totalArticles.value = data.data.articles;
+  getRandomNews();
   // getRandomNews();
 });
 

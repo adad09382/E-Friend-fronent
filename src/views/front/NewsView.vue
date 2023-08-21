@@ -77,7 +77,7 @@ import "swiper/css/effect-fade";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/autoplay";
-import axios from "axios";
+import { api } from "@/plugins/axios";
 import { useSnackbar } from "vuetify-use-dialog";
 
 // swiper輪播圖用
@@ -88,26 +88,6 @@ const createSnackbar = useSnackbar();
 //  教材-文章 card，從api get NEWS
 const totalArticles = ref([]);
 const randomArticles = ref([]);
-const API_KEY = import.meta.env.VITE_NEWS_API;
-const BASE_URL = "https://newsapi.org/v2/top-headlines";
-
-const getTotalNews = async (pageSize, page) => {
-  console.log("執行get 新聞 ");
-  const params = {
-    country: "us",
-    apiKey: API_KEY,
-    pageSize: pageSize,
-    page: page,
-  };
-  try {
-    const { data } = await axios.get(BASE_URL, { params: params });
-    totalArticles.value = data.articles;
-    getRandomNews();
-  } catch (error) {
-    console.error("Error fetching news count:", error);
-  }
-};
-
 const getRandomNews = () => {
   console.log("執行隨機get 3 新聞");
   if (totalArticles.value.length < 3) {
@@ -126,28 +106,27 @@ const getRandomNews = () => {
   );
 };
 
-const morePage = ref(2);
+let morePage = 1;
 const moreNews = async () => {
-  console.log("執行get  more新聞 ");
-  const params = {
-    country: "us",
-    apiKey: API_KEY,
-    pageSize: 15,
-    page: morePage.value,
-  };
+  console.log("執行get more新聞 ");
   try {
-    const { data } = await axios.get(BASE_URL, { params: params });
-    totalArticles.value.push(...data.articles);
-    morePage.value++;
+    const { data } = await api.post("/news", {
+      morePage,
+    });
+    totalArticles.value.push(...data.data.articles);
+    morePage++;
   } catch (error) {
-    console.error("Error fetching news count:", error);
+    console.log("獲得 more 新聞錯誤");
+    console.log(error);
   }
 };
 // 和news api get 15則新聞，並將其中3則放入 randomArticles
 onMounted(async () => {
+  // await getTotalNews(15, 1);
+  const { data } = await api.get("/news");
+  totalArticles.value = data.data.articles;
   //重新在隨機放入3則新聞進 randomArticles
-  await getTotalNews(15, 1);
-  // getRandomNews();
+  getRandomNews();
 });
 </script>
 
