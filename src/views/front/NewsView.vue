@@ -123,10 +123,16 @@ const moreNews = async () => {
 // 和news api get 15則新聞，並將其中3則放入 randomArticles
 onMounted(async () => {
   // await getTotalNews(15, 1);
-  const { data } = await api.get("/news");
-  totalArticles.value = data.data.articles;
+  try {
+    const { data } = await api.get("/news");
+    totalArticles.value = data.data.articles;
+    getRandomNews();
+  } catch (error) {
+    console.log("get 新聞錯誤");
+    console.log(error);
+  }
+
   //重新在隨機放入3則新聞進 randomArticles
-  getRandomNews();
 });
 </script>
 
