@@ -26,7 +26,9 @@
                 gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)"
                 cover
               >
-                <a :href="news.url" class="newTitle">{{ news.title }}</a>
+                <a :href="news.url" target="_blank" class="newTitle">{{
+                  news.title
+                }}</a>
               </v-img>
             </v-card>
           </swiper-slide>
@@ -47,12 +49,15 @@
           <div class="img">
             <img :src="article.urlToImage" alt="" />
           </div>
-          <div class="text">
-            <a :href="article.url" class="littleNewsTitle">{{
+          <div class="text d-flex flex-column">
+            <a :href="article.url" target="_blank" class="littleNewsTitle">{{
               article.title
             }}</a>
             <p class="newsDescription">{{ article.description }}</p>
             <p class="newsDate">{{ article.publishedAt.substring(0, 10) }}</p>
+            <v-btn class="newsBtn" @click="handleConversationClick(article)"
+              >Let's talk News</v-btn
+            >
           </div>
         </div>
       </v-col>
@@ -79,6 +84,12 @@ import "swiper/css/pagination";
 import "swiper/css/autoplay";
 import { api } from "@/plugins/axios";
 import { useSnackbar } from "vuetify-use-dialog";
+import { useConversationsStore } from "@/store/conversations";
+
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+const conversations = useConversationsStore();
 
 // swiper輪播圖用
 import { EffectFade, Navigation, Pagination, Autoplay } from "swiper/modules";
@@ -120,6 +131,7 @@ const moreNews = async () => {
     console.log(error);
   }
 };
+
 // 和news api get 15則新聞，並將其中3則放入 randomArticles
 onMounted(async () => {
   // await getTotalNews(15, 1);
@@ -134,6 +146,38 @@ onMounted(async () => {
 
   //重新在隨機放入3則新聞進 randomArticles
 });
+
+// 創建Conversation 並跳轉進 conversation 頁面
+let conversationResult = ref();
+
+const createConversation = async (topic, content) => {
+  conversationResult.value = await conversations.createConversation(
+    topic,
+    content,
+  );
+  console.log("即將跳轉是conversation path");
+  router.push("/conversation/" + conversationResult.value._id);
+};
+
+const handleConversationClick = (article) => {
+  const content = `The most important this is always limit your response within 30words.
+  Play as  my friend  for English speaking practice, and the situation is as follows:
+
+Situation:
+I and you are doing discussing the news (not show the ), 
+Objective:
+The summary of this news is ${article.description}
+
+Note:
+*Use casual language, like in a real-life conversation
+*Incorporate anecdotes or experiences, even though as an AI, you don’t have personal experiences. Make them up where appropriate
+*Express “personal” thoughts, questions or concerns to stimulate user interest and engagement.
+*Ask open-ended questions that encourage the user to share their throughs, experiences, or advice
+*It is okay to go off-topic sometimes, if you can bring the conversation back to the main topic and scenario eventually. This will make the conversation more natural and interesting.
+*Don’t break from your character. Do not say “As an AI…” You can make things up if necessary. Remember, we are just practicing speaking English.
+*Do not stop the conversation unless I ask you to.`;
+  createConversation(article.title, content);
+};
 </script>
 
 <style scoped>
@@ -185,5 +229,9 @@ onMounted(async () => {
 }
 .newsDate {
   font-size: 0.75rem;
+}
+
+.newsBtn {
+  margin: 0.05rem auto;
 }
 </style>

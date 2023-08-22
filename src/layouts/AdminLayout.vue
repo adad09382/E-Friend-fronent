@@ -27,7 +27,6 @@ const user = useUserStore();
 const { avatar, account } = storeToRefs(user);
 const navItems = [
   { to: "/admin/topic", title: "話題管理", icon: "mdi-message" },
-  { to: "/admin/news", title: "新聞管理", icon: "mdi-newspaper" },
   { to: "/", title: "回首頁", icon: "mdi-home" },
 ];
 </script>
