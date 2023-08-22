@@ -1,6 +1,7 @@
 <template>
   <v-app-bar color="#fff">
-    <v-btn :active="false" to="/">
+    <v-btn class="logoBtn" :active="false" to="/">
+      <v-img src="@/assets/logo.svg" alt="logo" max-width="30%"></v-img>
       <v-app-bar-title class="web-title">E-Friend </v-app-bar-title>
     </v-btn>
     <span class="web-subtitle"></span>
@@ -179,6 +180,7 @@ const navigateToLatestConversation = async () => {
 
 <style scoped>
 .web-title {
+  width: 170px;
   color: #f04e37;
   font-size: 2rem;
 }
@@ -186,5 +188,9 @@ const navigateToLatestConversation = async () => {
 .web-subtitle {
   margin-top: 0.5rem;
   color: #f04e37;
+}
+.logoBtn {
+  width: 180px;
+  margin-bottom: 0.5rem;
 }
 </style>
