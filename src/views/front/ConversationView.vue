@@ -228,11 +228,6 @@ const sortedConversations = computed(() => {
   height: 100% !important;
 }
 
-.chat-responsive {
-  overflow-y: hidden;
-  height: 500px;
-}
-
 .chat-card {
   display: flex;
   flex-direction: column;
@@ -240,7 +235,6 @@ const sortedConversations = computed(() => {
 }
 
 .chat-text {
-  height: 500px;
   overflow-y: auto;
 }
 

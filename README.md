@@ -1,4 +1,4 @@
-# essentials
+# E-Friend 你的英語口說練習好夥伴
 
 ## Project setup
 

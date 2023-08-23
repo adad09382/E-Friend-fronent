@@ -7,27 +7,19 @@
         :spaceBetween="30"
         :effect="'fade'"
         :navigation="true"
-        :pagination="{
-          clickable: true,
-        }"
+        :pagination="{ clickable: true }"
         :modules="modules"
         :loop="true"
-        :autoplay="{
-          delay: 3000,
-        }"
+        :autoplay="{ delay: 3000 }"
         class="mySwiper"
       >
-        <swiper-slide class="home-slide"
-          ><img src="@/assets/home_topic.jpg" />
-          <v-btn class="topic-btn" to="/topic"></v-btn>
-        </swiper-slide>
-        <swiper-slide class="home-slide"
-          ><img src="@/assets/home_teacher.jpg" />
-          <v-btn class="teacher-btn" to="/topic"></v-btn>
-        </swiper-slide>
-        <swiper-slide class="home-slide"
-          ><img src="@/assets/home_news.jpg" />
-          <v-btn class="news-btn" to="/news"></v-btn>
+        <swiper-slide
+          v-for="(slide, index) in slides"
+          :key="index"
+          class="home-slide"
+        >
+          <img :src="slide.image" />
+          <v-btn :class="slide.buttonClass" :to="slide.route"></v-btn>
         </swiper-slide>
       </swiper>
     </v-col>
@@ -36,7 +28,7 @@
       <v-col cols="10">
         <h1 class="text-center">
           不限時間，不限地點 <br />
-          <span style="color: #f04e37"> 一天24小時， 一年365天 </span>
+          <span style="color: #045a69"> 一天24小時， 一年365天 </span>
         </h1>
         <v-container>
           <br />
@@ -65,7 +57,7 @@
     <!-- 教材 -->
     <v-col cols="12">
       <h1 class="text-center">
-        <span style="color: #f04e37"> 有趣且豐富 </span><br />
+        <span style="color: #045a69"> 有趣且豐富 </span><br />
         適合各程度學習者的口說材料
       </h1>
       <br />
@@ -142,7 +134,7 @@
         <!-- 學員心得 -->
         <v-col cols="10">
           <h1 class="text-center">
-            學員 <span style="color: #f04e37"> 心得分享 </span><br />
+            學員 <span style="color: #045a69"> 心得分享 </span><br />
           </h1>
           <br />
           <v-row class="d-flex justify-center">
@@ -241,6 +233,26 @@ const modules = [EffectFade, Navigation, Pagination, Autoplay];
 
 const createSnackbar = useSnackbar();
 
+// 輪播圖
+const slides = ref([
+  {
+    image: new URL("../../assets/ai_topics_darkblue.jpg", import.meta.url).href,
+    buttonClass: "topic-btn",
+    route: "/topic",
+  },
+  {
+    image: new URL("../../assets/ai_teacher_darkblue.jpg", import.meta.url)
+      .href,
+    buttonClass: "teacher-btn",
+    route: "/topic",
+  },
+  {
+    image: new URL("../../assets/ai_news_darkblue.jpg", import.meta.url).href,
+    buttonClass: "news-btn",
+    route: "/news",
+  },
+]);
+
 // 優勢
 const advantages = ref([
   {
@@ -277,27 +289,33 @@ const advantages = ref([
 // 教材-對話 small card
 const cards = ref([
   {
-    img: "https://engoo.com.tw/assets/general/homepage/materials-oren-01.svg",
+    img: new URL("../../assets/dialogue.jpg", import.meta.url).href,
+
     title: "日常對話",
   },
   {
-    img: "https://engoo.com.tw/assets/general/homepage/materials-oren-03.svg",
+    img: new URL("../../assets/child.svg", import.meta.url).href,
+
     title: "興趣對話",
   },
   {
-    img: "https://engoo.com.tw/assets/general/homepage/materials-oren-04.svg",
+    img: new URL("../../assets/travel.svg", import.meta.url).href,
+
     title: "旅遊對話",
   },
   {
-    img: "https://engoo.com.tw/assets/general/homepage/materials-oren-02.svg",
+    img: new URL("../../assets/business.svg", import.meta.url).href,
+
     title: "職場對話",
   },
   {
-    img: "https://engoo.com.tw/assets/general/homepage/materials-oren-06.svg",
+    img: new URL("../../assets/exam.svg", import.meta.url).href,
+
     title: "考試對話",
   },
   {
-    img: "https://engoo.com.tw/assets/general/homepage/materials-oren-05.svg",
+    img: new URL("../../assets/grammar.jpg", import.meta.url).href,
+
     title: "情境對話",
   },
 ]);
