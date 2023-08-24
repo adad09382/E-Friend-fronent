@@ -28,12 +28,12 @@
             type="text"
             outlined
             append-inner-icon="mdi-send"
-            @click:append-inner="loading ? null : handleChat"
-            @keyup.enter="loading ? null : handleChat"
+            @click:append-inner="handleChat"
+            @keyup.enter="handleChat"
             :append-icon="
               audioRunning ? 'mdi-microphone-off' : 'mdi-microphone'
             "
-            @click:append="loading ? null : startRecordAndRecognition"
+            @click:append="startRecordAndRecognition"
             hide-details
           ></v-text-field>
         </v-card-text>
