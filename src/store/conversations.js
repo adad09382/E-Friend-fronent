@@ -357,6 +357,7 @@ export const useConversationsStore = defineStore("conversations", () => {
 
   watch(result, () => {
     console.log(result.value);
+    question.value = result.value;
   });
 
   const toggleSpeechRecognition = () => {

@@ -12,16 +12,17 @@
     <v-spacer></v-spacer>
 
     <v-app-bar-nav-icon
+      :active="false"
       v-if="isMobile"
       @click="drawer = !drawer"
     ></v-app-bar-nav-icon>
     <template v-if="!isMobile">
       <template v-for="navItem in navItems" :key="navItem.to">
         <v-btn
-          :active="false"
           v-if="navItem.show"
           :to="navItem.to"
           :prepend-icon="navItem.icon"
+          exact
         >
           {{ navItem.text }}</v-btn
         >
@@ -35,6 +36,7 @@
       </template>
     </template>
   </v-app-bar>
+
   <v-navigation-drawer
     v-if="isMobile"
     v-model="drawer"
@@ -43,7 +45,7 @@
   >
     <v-list>
       <template v-for="navItem in navItems" :key="navItem.to">
-        <v-list-item v-if="navItem.show" :to="navItem.to">
+        <v-list-item v-if="navItem.show" :to="navItem.to" exact>
           <template v-slot:prepend>
             <v-icon :icon="navItem.icon"></v-icon>
             <v-list-item-title>{{ navItem.text }}</v-list-item-title>
@@ -79,12 +81,13 @@
 import { ref, computed } from "vue";
 import { useDisplay } from "vuetify";
 import { storeToRefs } from "pinia";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { useSnackbar } from "vuetify-use-dialog";
 import { useUserStore } from "@/store/user.js";
 import { apiAuth } from "@/plugins/axios.js";
 
 const router = useRouter();
+const route = useRoute();
 
 const user = useUserStore();
 const { isLogin, isAdmin } = storeToRefs(user);
@@ -118,6 +121,10 @@ const navItems = computed(() => {
     },
     { to: "/login", text: "登入", icon: "mdi-login", show: !isLogin.value },
   ];
+});
+
+const activeRoute = computed(() => {
+  return route.params.id;
 });
 
 const logout = async () => {
@@ -169,7 +176,7 @@ const navigateToLatestConversation = async () => {
       text: "您目前尚無創建對話話題，請從探索話題開始選擇話題",
       showCloseButton: false,
       snackbarProps: {
-        timeout: 5000,
+        timeout: 2500,
         color: "red",
         location: "bottom",
       },
@@ -192,5 +199,9 @@ const navigateToLatestConversation = async () => {
 .logoBtn {
   width: 180px;
   margin-bottom: 0.5rem;
+}
+
+.active-route {
+  opacity: 0 !important;
 }
 </style>

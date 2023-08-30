@@ -54,7 +54,9 @@
               article.title
             }}</a>
             <p class="newsDescription">{{ article.description }}</p>
-            <p class="newsDate">{{ article.publishedAt.substring(0, 10) }}</p>
+            <p class="newsDate">
+              {{ formatPublishedDate(article.publishedAt) }}
+            </p>
             <v-btn class="newsBtn" @click="handleConversationClick(article)"
               >Let's talk News</v-btn
             >
@@ -147,6 +149,15 @@ onMounted(async () => {
   //重新在隨機放入3則新聞進 randomArticles
 });
 
+// 將新聞日期格式化
+const formatPublishedDate = (date) => {
+  try {
+    return date.substring(0, 10);
+  } catch (error) {
+    return "N/A"; // 或者返回一个默认日期，如 '0000-00-00'
+  }
+};
+
 // 創建Conversation 並跳轉進 conversation 頁面
 let conversationResult = ref();
 
@@ -161,10 +172,10 @@ const createConversation = async (topic, content) => {
 
 const handleConversationClick = (article) => {
   const content = `The most important this is always limit your response within 30words.
-  Play as  my friend  for English speaking practice, and the situation is as follows:
+  Play as  my friend  for English and practice speaking English with me through the news, and the situation is as follows:
 
 Situation:
-I and you are doing discussing the news (not show the ), 
+You and I are discussing a news story, and you take the lead in expressing your opinion about the story and communicating with me.
 Objective:
 The summary of this news is ${article.description}
 

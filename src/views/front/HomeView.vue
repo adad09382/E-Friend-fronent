@@ -92,16 +92,16 @@
             >
               <div class="text">
                 <a :href="article.url" class="title" target="_blank">{{
-                  article.title
+                  article?.title
                 }}</a>
                 <div></div>
                 <div class="subtitle">
-                  {{ article.publishedAt.substring(0, 10) }}
+                  {{ formatPublishedDate(article.publishedAt) }}
                 </div>
-                <div class="content">{{ article.description }}</div>
+                <div class="content">{{ article?.description }}</div>
               </div>
               <div class="img">
-                <img :src="article.urlToImage" alt="" />
+                <img :src="article?.urlToImage" alt="" />
               </div>
             </div>
             <v-btn :active="false" @click="getRandomNews" class="margin-top">
@@ -370,6 +370,14 @@ onMounted(async () => {
   // getRandomNews();
 });
 
+// 將新聞日期格式化
+const formatPublishedDate = (date) => {
+  try {
+    return date.substring(0, 10);
+  } catch (error) {
+    return "N/A"; // 或者返回一个默认日期，如 '0000-00-00'
+  }
+};
 // 學員心得 card
 const people = ref([
   {

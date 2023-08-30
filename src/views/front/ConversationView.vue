@@ -231,7 +231,7 @@ const sortedConversations = computed(() => {
 .chat-card {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: 89vh;
 }
 
 .chat-text {
